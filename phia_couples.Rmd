@@ -1,0 +1,861 @@
+---
+title: "PHIA couples"
+output: word_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse); library(viridis); library(ggbreak); library(ggridges); library(ggnewscale); library(scales); library(survey); library(lme4)
+source("~/Downloads/phia_couples_fx.R")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+mphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/MPHIA 2015-2016/MPHIA 2015-2016 Household Interview and Biomarker Datasets v2.0 (DTA)/mphia2015adultind.dta", survey = "mphia")
+camphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/CAMPHIA 2017-2018/CAMPHIA 2017-2018 Household Interview and Biomarker Datasets v1.1 (DTA)/camphia2017adultind.dta", survey = "camphia")
+ciphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/CIPHIA 2017-2018/CIPHIA 2017-2018 Household Interview and Biomarker Datasets  (DTA)/ciphia2017adultind.dta", survey = "ciphia")
+ephia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/EPHIA 2017-2018/EPHIA 2017-2018 Household Interview and Biomarker Datasets v1.1 (DTA)/ephia2017adultind.dta", survey = "ephia")
+insida <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/INSIDA 2021/INSIDA 2021 Household Interview and Biomarker Datasets (DTA)/insida2021adultind.dta",
+                         y = "/Users/krisher/Downloads/PHIA data/INSIDA 2021/INSIDA 2021 Household Interview and Biomarker Datasets (DTA)/insida2021roster.dta", survey = "insida")
+kenphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/KENPHIA 2018/KENPHIA 2018 Household Interview and Biomarker Datasets v1.1 (DTA)/kenphia2018adultind.dta", survey = "kenphia")
+lephia1 <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/LePHIA 2016-2017/LePHIA 2016-2017 Household Interview and Biomarker Datasets v1.1 (DTA)/lephia2016adultind.dta", survey = "lephia1")
+lephia2 <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/LePHIA 2020/LePHIA 2020 Household Interview and Biomarker Datasets (DTA)/lephia2020adultind.dta",
+                          y = "/Users/krisher/Downloads/PHIA data/LePHIA 2020/LePHIA 2020 Household Interview and Biomarker Datasets (DTA)/lephia2020roster.dta", survey = "lephia2")
+mphia2 <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/MPHIA 2020-2021/MPHIA 2020-2021 Household Interview and Biomarker Data/mphia2020adultind.dta",
+                         y = "/Users/krisher/Downloads/PHIA data/MPHIA 2020-2021/MPHIA 2020-2021 Household Interview and Biomarker Data/mphia2020roster.dta", survey = "mphia2")
+namphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/NAMPHIA 2017/NAMPHIA 2017 Household Interview and Biomarker Datasets v1.1 (DTA)/namphia2017adultind.dta", survey = "namphia")
+rphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/RPHIA 2018-2019/RPHIA 2018-2019 Household Interview and Biomarker Datasets v1.1 (DTA)/rphia2018adultind.dta", survey = "rphia")
+shims2 <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/SHIMS2 2016-2017/SHIMS2 2016-2017 Household Interview and Biomarker Datasets v2.0 (DTA)/shims22016adultind.dta", survey = "shims2")
+shims3 <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/SHIMS3 2021/SHIMS3 2021 Household Interview and Biomarker Datasets (DTA)/shims32021adultind.dta",
+                         y = "/Users/krisher/Downloads/PHIA data/SHIMS3 2021/SHIMS3 2021 Household Interview and Biomarker Datasets (DTA)/shims32021roster.dta", survey = "shims3")
+this <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/THIS 2016-2017/THIS 2016-2017 Household Interview and Biomarker Datasets v2.0 (DTA)/this2016adultind.dta", survey = "this")
+this2 <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/THIS 2022-2023/THIS 2022-2023 Household Interview and Biomarker Datasets (DTA)/this2022adultind.dta",
+                        y = "/Users/krisher/Downloads/PHIA data/THIS 2022-2023/THIS 2022-2023 Household Interview and Biomarker Datasets (DTA)/this2022roster.dta",
+                        survey = "this2")
+uphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/UPHIA 2016-2017/UPHIA 2016-2017 Household Interview and Biomarker Datasets v1.1 (DTA)/uphia2016adultind.dta", survey = "uphia")
+uphia2 <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/UPHIA 2020-2021/UPHIA 2020-2021 Household and Interview and Biomarker Datasets (DTA)/uphia2020adultind.dta", 
+                         y = "/Users/krisher/Downloads/PHIA data/UPHIA 2020-2021/UPHIA 2020-2021 Household and Interview and Biomarker Datasets (DTA)/uphia2020roster.dta",
+                         survey = "uphia2")
+ruphia <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/RUPHIA 2021/RUPHIA 2021 Household Interview and Biomarker Datasets (DTA)/ruphia2021adultind.dta", 
+                         y = "/Users/krisher/Downloads/PHIA data/RUPHIA 2021/RUPHIA 2021 Household Interview and Biomarker Datasets (DTA)/ruphia2021roster.dta",
+                         survey = "ruphia")
+zamphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/ZAMPHIA 2016/ZAMPHIA 2016 Household Interview and Biomarker Datasets v2.0 (DTA)/zamphia2016adultind.dta", survey = "zamphia")
+zimphia <- phia_ind_clean("/Users/krisher/Downloads/PHIA data/ZIMPHIA 2015-2016/ZIMPHIA 2015-2016 Household Interview and Biomarker Datasets (DTA)/zimphia2015adultind.dta", survey = "zimphia")
+zimphia2 <- phia_ind_clean(x = "/Users/krisher/Downloads/PHIA data/ZIMPHIA 2020/ZIMPHIA 2020 Household Interview and Biomarker Datasets (DTA)/zimphia2020adultind.dta",
+                           y = "/Users/krisher/Downloads/PHIA data/ZIMPHIA 2020/ZIMPHIA 2020 Household Interview and Biomarker Datasets (DTA)/zimphia2020roster.dta", survey = "zimphia2")
+
+
+mphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/MPHIA 2015-2016/MPHIA 2015-2016 Household Interview and Biomarker Datasets v2.0 (DTA)/mphia2015adultbio.dta")
+camphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/CAMPHIA 2017-2018/CAMPHIA 2017-2018 Household Interview and Biomarker Datasets v1.1 (DTA)/camphia2017adultbio.dta")
+ciphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/CIPHIA 2017-2018/CIPHIA 2017-2018 Household Interview and Biomarker Datasets  (DTA)/ciphia2017adultbio.dta")
+ephia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/EPHIA 2017-2018/EPHIA 2017-2018 Household Interview and Biomarker Datasets v1.1 (DTA)/ephia2017adultbio.dta")
+insida_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/INSIDA 2021/INSIDA 2021 Household Interview and Biomarker Datasets (DTA)/insida2021adultbio.dta")
+kenphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/KENPHIA 2018/KENPHIA 2018 Household Interview and Biomarker Datasets v1.1 (DTA)/kenphia2018adultbio.dta")
+lephia1_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/LePHIA 2016-2017/LePHIA 2016-2017 Household Interview and Biomarker Datasets v1.1 (DTA)/lephia2016adultbio.dta")
+lephia2_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/LePHIA 2020/LePHIA 2020 Household Interview and Biomarker Datasets (DTA)/lephia2020adultbio.dta")
+mphia2_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/MPHIA 2020-2021/MPHIA 2020-2021 Household Interview and Biomarker Data/mphia2020adultbio.dta")
+namphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/NAMPHIA 2017/NAMPHIA 2017 Household Interview and Biomarker Datasets v1.1 (DTA)/namphia2017adultbio.dta")
+rphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/RPHIA 2018-2019/RPHIA 2018-2019 Household Interview and Biomarker Datasets v1.1 (DTA)/rphia2018adultbio.dta")
+shims2_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/SHIMS2 2016-2017/SHIMS2 2016-2017 Household Interview and Biomarker Datasets v2.0 (DTA)/shims22016adultbio.dta")
+shims3_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/SHIMS3 2021/SHIMS3 2021 Household Interview and Biomarker Datasets (DTA)/shims32021adultbio.dta")
+this_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/THIS 2016-2017/THIS 2016-2017 Household Interview and Biomarker Datasets v2.0 (DTA)/this2016adultbio.dta")
+this2_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/THIS 2022-2023/THIS 2022-2023 Household Interview and Biomarker Datasets (DTA)/this2022adultbio.dta")
+uphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/UPHIA 2016-2017/UPHIA 2016-2017 Household Interview and Biomarker Datasets v1.1 (DTA)/uphia2016adultbio.dta")
+uphia2_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/UPHIA 2020-2021/UPHIA 2020-2021 Household and Interview and Biomarker Datasets (DTA)/uphia2020adultbio.dta")
+ruphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/RUPHIA 2021/RUPHIA 2021 Household Interview and Biomarker Datasets (DTA)/ruphia2021adultbio.dta")
+zamphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/ZAMPHIA 2016/ZAMPHIA 2016 Household Interview and Biomarker Datasets v2.0 (DTA)/zamphia2016adultbio.dta")
+zimphia_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/ZIMPHIA 2015-2016/ZIMPHIA 2015-2016 Household Interview and Biomarker Datasets (DTA)/zimphia2015adultbio.dta")
+zimphia2_bio <- phia_bio_clean("/Users/krisher/Downloads/PHIA data/ZIMPHIA 2020/ZIMPHIA 2020 Household Interview and Biomarker Datasets (DTA)/zimphia2020adultbio.dta")
+
+
+
+mphia <- phia_join_ind_bio(mphia, mphia_bio)
+camphia <- phia_join_ind_bio(camphia, camphia_bio)
+ciphia <- phia_join_ind_bio(ciphia, ciphia_bio)
+ephia <- phia_join_ind_bio(ephia, ephia_bio)
+insida <- phia_join_ind_bio(insida, insida_bio)
+kenphia <- phia_join_ind_bio(kenphia, kenphia_bio)
+lephia1 <- phia_join_ind_bio(lephia1, lephia1_bio)
+lephia2 <- phia_join_ind_bio(lephia2, lephia2_bio)
+mphia2 <- phia_join_ind_bio(mphia2, mphia2_bio)
+namphia <- phia_join_ind_bio(namphia, namphia_bio)
+rphia <- phia_join_ind_bio(rphia, rphia_bio)
+shims2 <- phia_join_ind_bio(shims2, shims2_bio)
+shims3 <- phia_join_ind_bio(shims3, shims3_bio)
+this <- phia_join_ind_bio(this, this_bio)
+this2 <- phia_join_ind_bio(this2, this2_bio)
+uphia <- phia_join_ind_bio(uphia, uphia_bio)
+uphia2 <- phia_join_ind_bio(uphia2, uphia2_bio)
+ruphia <- phia_join_ind_bio(ruphia, ruphia_bio)
+zamphia <- phia_join_ind_bio(zamphia, zamphia_bio)
+zimphia <- phia_join_ind_bio(zimphia, zimphia_bio)
+zimphia2 <- phia_join_ind_bio(zimphia2, zimphia2_bio)
+
+mphia_couples <- phia_make_couples(mphia)
+camphia_couples <- phia_make_couples(camphia)
+ciphia_couples <- phia_make_couples(ciphia)
+ephia_couples <- phia_make_couples(ephia)
+insida_couples <- phia_make_couples(insida)
+kenphia_couples <- phia_make_couples(kenphia)
+lephia1_couples <- phia_make_couples(lephia1)
+lephia2_couples <- phia_make_couples(lephia2)
+mphia2_couples <- phia_make_couples(mphia2)
+namphia_couples <- phia_make_couples(namphia)
+rphia_couples <- phia_make_couples(rphia)
+shims2_couples <- phia_make_couples(shims2)
+shims3_couples <- phia_make_couples(shims3)
+this_couples <- phia_make_couples(this)
+this2_couples <- phia_make_couples(this2)
+uphia_couples <- phia_make_couples(uphia)
+uphia2_couples <- phia_make_couples(uphia2)
+ruphia_couples <- phia_make_couples(ruphia)
+zamphia_couples <- phia_make_couples(zamphia)
+zimphia_couples <- phia_make_couples(zimphia)
+zimphia2_couples <- phia_make_couples(zimphia2)
+
+phia_all_couples <- bind_rows(mphia_couples,camphia_couples,
+                                               ciphia_couples, ephia_couples,
+                                               insida_couples, kenphia_couples,
+                                               lephia1_couples, lephia2_couples,
+                                               mphia2_couples, namphia_couples,
+                                               rphia_couples, shims2_couples,
+                                               shims3_couples, this_couples,
+                                              this2_couples,
+                                               uphia_couples, uphia2_couples,
+                                              ruphia_couples, zamphia_couples,
+                                               zimphia_couples, zimphia2_couples)
+
+phia_all_couples <- phia_all_couples %>%
+  filter(!is.na(btwt0_m) & !is.na(btwt0_f)) %>%
+  group_by(survey_m) %>%
+  mutate(weightsum = sum(btwt0_m)) %>%
+  ungroup() %>%
+  mutate(new_wt = btwt0_m / (weightsum * sum(weightsum) / sum(weightsum)))
+
+dat_to_mplus <- phia_all_couples %>%
+  select(age_f,personid_f,schlat_f,survey_f,fullstatus_f,hivstatusfinal_f,
+         partnerid, age_m, schlat_m, fullstatus_m, hivstatusfinal_m, new_wt) %>%
+  filter(!is.na(fullstatus_f) & !is.na(fullstatus_m)) %>%
+  mutate(eng_f = ifelse(fullstatus_f =="LHIV, VS" | fullstatus_f=="HIV-, tested past year",
+                            1,0),
+         eng_m = ifelse(fullstatus_m =="LHIV, VS" | fullstatus_m=="HIV-, tested past year",
+                            1,0)) %>%
+  mutate(id_f = as.numeric(factor(personid_f)),
+         schl_f = ifelse(schlat_f<0,NA,schlat_f),
+         survey = as.numeric(factor(survey_f)),
+         full_f = as.numeric(factor(fullstatus_f)),
+         id_m = as.numeric(factor(partnerid)),
+         schl_m = ifelse(schlat_m<0,NA,schlat_m),
+         full_m = as.numeric(factor(fullstatus_m)),
+         hiv_f = hivstatusfinal_f,
+         hiv_m = hivstatusfinal_m) %>%
+  select(age_f, id_f, schl_f, survey, full_f, hiv_f, id_m, age_m,
+         schl_m, full_m, hiv_m, new_wt, eng_f, eng_m)
+
+dat_to_mplus[is.na(dat_to_mplus)] <- -999
+
+write.table(dat_to_mplus, file = "~/Downloads/phia_test.txt", sep = ",",
+            row.names = FALSE, col.names = FALSE)
+
+# ATTEMPT APIM in MLM
+dat_multi <- phia_all_couples %>%
+  select(age_f,personid_f,schlat_f,survey_f,fullstatus_f,hivstatusfinal_f,
+         partnerid, age_m, schlat_m, fullstatus_m, hivstatusfinal_m, new_wt) %>%
+    mutate(both_partners = case_when(hivstatusfinal_f==1 & hivstatusfinal_m==1 ~ "Seroconcordant, LHIV",
+                                   hivstatusfinal_f==1 & hivstatusfinal_m==2 ~ 
+                                     "Serodiscordant, FLHIV",
+                                   hivstatusfinal_f==2 & hivstatusfinal_m==1 ~ 
+                                     "Serodiscordant, MLHIV",
+                                   hivstatusfinal_f==2 & hivstatusfinal_m==2 ~ 
+                                     "Seroconcordant, Negative",
+                                   TRUE ~ NA_character_)) %>%
+  filter(!is.na(fullstatus_f) & !is.na(fullstatus_m)) %>%
+  mutate(eng_f = ifelse(fullstatus_f =="LHIV, VS" | fullstatus_f=="HIV-, tested past year",
+                            1,0),
+         eng_m = ifelse(fullstatus_m =="LHIV, VS" | fullstatus_m=="HIV-, tested past year",
+                            1,0)) %>%
+  mutate(id_f = as.numeric(factor(personid_f)),
+         schl_f = ifelse(schlat_f<0,NA,schlat_f),
+         survey = as.numeric(factor(survey_f)),
+         full_f = as.numeric(factor(fullstatus_f)),
+         id_m = as.numeric(factor(partnerid)),
+         schl_m = ifelse(schlat_m<0,NA,schlat_m),
+         full_m = as.numeric(factor(fullstatus_m)),
+         hiv_f = hivstatusfinal_f,
+         hiv_m = hivstatusfinal_m) %>%
+  select(age_f, id_f, schl_f, survey, full_f, hiv_f, id_m, age_m,
+         schl_m, full_m, hiv_m, new_wt, eng_f, eng_m, both_partners) %>%
+  mutate(dyad_id = paste0(id_f,"_",survey))
+
+fdat <- dat_multi %>%
+  mutate(sex = "f",
+         act_age = age_f,
+         act_edu = schl_f,
+         act_full = full_f,
+         act_hiv = hiv_f,
+         act_eng = eng_f,
+         part_age = age_m,
+         part_edu = schl_m,
+         part_full = full_m,
+         part_hiv = hiv_m,
+         part_eng = eng_m) %>%
+  select(dyad_id, both_partners, new_wt, survey, sex, act_age,
+         act_edu, act_full, act_hiv, act_eng, part_age, 
+         part_edu, part_full, part_hiv, part_eng)
+
+mdat <- dat_multi %>%
+  mutate(sex = "m",
+         act_age = age_m,
+         act_edu = schl_m,
+         act_full = full_m,
+         act_hiv = hiv_m,
+         act_eng = eng_m,
+         part_age = age_f,
+         part_edu = schl_f,
+         part_full = full_f,
+         part_hiv = hiv_f,
+         part_eng = eng_f) %>%
+  select(dyad_id, both_partners, new_wt, survey, sex, act_age,
+         act_edu, act_full, act_hiv, act_eng, part_age, 
+         part_edu, part_full, part_hiv, part_eng)
+
+dat_multi_long <- bind_rows(fdat,mdat)
+
+m <- glmer(act_eng ~ act_age + part_age + sex + sex*act_age + sex*part_age +
+             (1 | dyad_id),
+           data = dat_multi_long, family = binomial)
+
+########
+########
+########
+
+
+
+phia_plotdat_all <- mixing_plot_data(phia_all_couples)
+
+# phia_plotdat_all$m_testing <- factor(phia_plotdat_all$m_testing,
+#                                      levels = c(levels(phia_plotdat_all$m_testing)[1:3], "", levels(phia_plotdat_all$m_testing)[4:7]))
+# 
+# phia_plotdat_all$f_testing <- factor(phia_plotdat_all$f_testing,
+#                                      levels = c(levels(phia_plotdat_all$f_testing)[1:3], "", levels(phia_plotdat_all$f_testing)[4:7]))
+
+# phia_plotdat_all <- phia_plotdat_all %>%
+#   bind_rows(data.frame(f_testing = factor(""),
+#                        m_testing = factor(""),
+#                        mixing = NA, cat = "test"))
+
+phia_plotdat_all$m_testing_numeric <- as.numeric(phia_plotdat_all$m_testing)
+phia_plotdat_all$f_testing_numeric <- as.numeric(phia_plotdat_all$f_testing)
+
+phia_plotdat_all <- phia_plotdat_all %>%
+  mutate(w = ifelse(m_testing=="",0.5,1),
+         xshift = ifelse(f_testing_numeric>3,0.15,-0.15),
+         yshift = ifelse(m_testing_numeric>3,0.15,-0.15),
+         color_col = ifelse(mixing<0.6,"white","black"))
+
+xshift_labels = ifelse(1:length(levels(phia_plotdat_all$f_testing))>3,0.15,-0.15)
+yshift_labels = ifelse(1:length(levels(phia_plotdat_all$m_testing))>3,0.15,-0.15)
+
+ggplot(phia_plotdat_all, aes(xmin=f_testing_numeric - w/2 + xshift, 
+                             xmax = f_testing_numeric + w/2 + xshift,
+                             ymin = m_testing_numeric - w /2 + yshift,
+                             ymax = m_testing_numeric + w /2  + yshift, fill = mixing)) +
+  geom_rect() +
+  scale_fill_viridis(trans="log",
+                     option = "C",
+                     breaks = c(0.05, 0.5, 1, 2.5),
+                     na.value = "white") +
+  # facet_wrap(vars(cat), nrow=2,
+  #            scales = "free") +
+  scale_x_continuous(expand = c(0,0),
+                     labels = stringr::str_wrap(levels(phia_plotdat_all$f_testing),
+                                                width = 18),
+                     breaks = 1:length(levels(phia_plotdat_all$f_testing)) + xshift_labels) +
+  scale_y_continuous(expand=c(0,0),
+    labels = stringr::str_wrap(levels(phia_plotdat_all$m_testing),
+                                                width = 18),
+                     breaks = 1:length(levels(phia_plotdat_all$m_testing)) + yshift_labels) +
+  # coord_cartesian(ylim = c(min(phia_plotdat_all$m_testing_numeric + phia_plotdat_all$yshift),
+  #                          max(phia_plotdat_all$m_testing_numeric + phia_plotdat_all$yshift))) +
+  # scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+  expand_limits() +
+  labs(x = "Female status",
+       y = "Male status",
+       fill = "Relative mixing") +
+  theme_minimal() +
+  guides(x = guide_axis(angle = 45)) +
+  geom_text(aes(x=f_testing_numeric + xshift,y=m_testing_numeric+yshift,color = color_col,
+                label = round(mixing,2))) +
+  # geom_shadowtext(aes(x=f_testing_numeric + xshift,y=m_testing_numeric+yshift), color ="white",bg.color='black', face.color='black') +
+  theme(strip.text = element_text(size = 14),
+        axis.title = element_text(size = 12)) +
+  scale_color_manual("",values = c("black","grey70"), guide = "none") +
+  geom_text(data = data.frame(f_testing_numeric = c(1.7, 4.75, 1.55, 4.75), 
+                              m_testing_numeric = c(3.5, 3.5, 7.8, 7.8), 
+                              labelvar = c("Seroconcordant, Negative","Serodiscordant, FLHIV",
+                                           "Serodiscordant, MLHIV", "Seroconcordant, LHIV"),
+                              mixing = NA,
+                              w = NA, xshift = NA, yshift=NA),
+            aes(x=f_testing_numeric, y=m_testing_numeric, label = labelvar)) +
+  coord_cartesian(clip = "off")
+
+# ggsave("~/Downloads/phia_testing_tx_mixing_test_labels.png",
+#        width = 8.5*.9, height = 6.75*.9, bg="white")
+
+# ggplot(phia_plotdat_all, aes(x=f_testing, y = m_testing, fill = mixing,
+#                              label = round(mixing,2))) +
+#   geom_tile(aes(width = w, height= w)) +
+#   scale_fill_viridis(trans="log",
+#                      option = "C",
+#                      breaks = c(0.05, 0.5, 1, 2.5),
+#                      na.value="white") +
+#   # facet_wrap(vars(cat), nrow=2,
+#   #            scales = "free") +
+#   scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+#   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+#   labs(x = "Female status",
+#        y = "Male status",
+#        fill = "Relative mixing") +
+#   theme_minimal() +
+#   guides(x = guide_axis(angle = 45)) +
+#   geom_text() +
+#   theme(strip.text = element_text(size = 14),
+#         axis.title = element_text(size = 12))
+
+# ggplot(phia_plotdat_all, aes(x=f_testing, y = m_testing, fill = mixing,
+#                              label = round(mixing,2))) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C",
+#                      breaks = c(0.05, 0.5, 1, 2.5)) +
+#   facet_wrap(vars(cat), nrow=2,
+#              scales = "free") +
+#   scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+#   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+#   labs(x = "Female status",
+#        y = "Male status",
+#        fill = "Relative mixing") +
+#   theme_minimal() +
+#   guides(x = guide_axis(angle = 45)) +
+#   geom_text() +
+#   theme(strip.text = element_text(size = 14),
+#         axis.title = element_text(size = 12))
+# 
+# ggsave("~/Downloads/phia_testing_tx_mixing.png",
+#        width = 8.5, height = 7)
+
+all_couples <- phia_all_couples
+
+all_couples <- all_couples %>%
+  filter(!is.na(fullstatus_f) & !is.na(fullstatus_m))
+
+nrow(all_couples)
+n_distinct(all_couples$personid_f) + n_distinct(all_couples$partnerid)
+all_couples_des <- svydesign(ids = all_couples$personid_f, 
+                       data = all_couples, weights = all_couples$new_wt)
+prop.table(svytable(~hivstatusfinal_f+hivstatusfinal_m, design = all_couples_des))
+
+n <- 1000
+bootdata <- list()
+for(i in 1:n){
+  bootdata[[i]] <- all_couples[sample(nrow(all_couples), replace = TRUE), ]
+}
+
+bootstrap_ci <- lapply(bootdata, mixing_plot_data)
+
+for(i in 1:n) {
+  bootstrap_ci[[i]]$iter <- i
+}
+
+test <- do.call(bind_rows,bootstrap_ci)
+
+knitr::kable(test %>%
+  group_by(cat, f_testing, m_testing) %>%
+  summarise(lb = quantile(mixing, 0.025),
+            ub = quantile(mixing, 0.975)))
+
+
+### descriptive plot
+
+dat_to_plot <- phia_all_couples
+
+dat_to_plot <- dat_to_plot %>%
+  mutate(both_partners = case_when(hivstatusfinal_f==1 & hivstatusfinal_m==1 ~ "Seroconcordant, LHIV",
+                                   hivstatusfinal_f==1 & hivstatusfinal_m==2 ~ 
+                                     "Serodiscordant, FLHIV",
+                                   hivstatusfinal_f==2 & hivstatusfinal_m==1 ~ 
+                                     "Serodiscordant, MLHIV",
+                                   hivstatusfinal_f==2 & hivstatusfinal_m==2 ~ 
+                                     "Seroconcordant, Negative",
+                                   TRUE ~ NA_character_))
+
+datplot_neg <- dat_to_plot %>%
+  filter(!is.na(fullstatus_m) & !is.na(fullstatus_f) & both_partners=="Seroconcordant, Negative") %>%
+  group_by(both_partners, fullstatus_m, fullstatus_f) %>%
+  summarise(counts = sum(new_wt)) %>%
+  ungroup() %>%
+  mutate(prop = counts / sum(counts))
+
+datplot_diff <- dat_to_plot %>%
+  filter(!is.na(fullstatus_m) & !is.na(fullstatus_f) & 
+           both_partners %in% c("Serodiscordant, MLHIV", "Serodiscordant, FLHIV")) %>%
+  group_by(both_partners, fullstatus_m, fullstatus_f) %>%
+  summarise(counts = sum(new_wt)) %>%
+  ungroup() %>%
+  mutate(prop = counts / sum(counts))
+
+datplot_pos <- dat_to_plot %>%
+  filter(!is.na(fullstatus_m) & !is.na(fullstatus_f) & both_partners=="Seroconcordant, LHIV") %>%
+  group_by(both_partners, fullstatus_m, fullstatus_f) %>%
+  summarise(counts = sum(new_wt)) %>%
+  ungroup() %>%
+  mutate(prop = counts / sum(counts))
+
+datplot <- bind_rows(datplot_neg, datplot_diff, datplot_pos)
+
+datplot$both_partners <- factor(datplot$both_partners,
+                                levels = c("Seroconcordant, Negative",
+                                           "Seroconcordant, LHIV",
+                                           "Serodiscordant, MLHIV",
+                                           "Serodiscordant, FLHIV"))
+datplot$fullstatus_m <- factor(datplot$fullstatus_m,
+                               levels = c("HIV-, never tested",
+                                          "HIV-, tested 1+ yrs ago",
+                                          "HIV-, tested past year",
+                                          "LHIV, unaware of status",
+                                          "LHIV, aware of status, not on ART",
+                                          "LHIV, on ART, not VS",
+                                          "LHIV, VS"))
+
+datplot$fullstatus_f <- factor(datplot$fullstatus_f,
+                               levels = c("HIV-, never tested",
+                                          "HIV-, tested 1+ yrs ago",
+                                          "HIV-, tested past year",
+                                          "LHIV, unaware of status",
+                                          "LHIV, aware of status, not on ART",
+                                          "LHIV, on ART, not VS",
+                                          "LHIV, VS"))
+
+datplot$m_testing_numeric <- as.numeric(datplot$fullstatus_m)
+datplot$f_testing_numeric <- as.numeric(datplot$fullstatus_f)
+
+datplot %>%
+  filter(both_partners=="Seroconcordant, Negative" & 
+           (fullstatus_m=="HIV-, never tested" | fullstatus_f=="HIV-, never tested")) %>%
+  filter(fullstatus_m!=fullstatus_f) %>%
+  summarise(tot = sum(prop))
+
+datplot %>%
+  filter(both_partners=="Seroconcordant, LHIV" & 
+           (fullstatus_m=="LHIV, unaware of status" | fullstatus_f=="LHIV, unaware of status")) %>%
+  summarise(tot = sum(prop))
+
+datplot <- datplot %>%
+  mutate(w = ifelse(fullstatus_m=="",0.5,1),
+         xshift = ifelse(f_testing_numeric>3,0.15,-0.15),
+         yshift = ifelse(m_testing_numeric>3,0.15,-0.15),
+         color_col = ifelse(prop<0.1,"white","black"))
+
+xshift_labels = ifelse(1:length(levels(datplot$fullstatus_f))>3,0.15,-0.15)
+yshift_labels = ifelse(1:length(levels(datplot$fullstatus_m))>3,0.15,-0.15)
+
+datplot <- datplot %>%
+  mutate(both_partners = forcats::fct_recode(both_partners,
+                                             "Sero-different, MLHIV" = "Serodiscordant, MLHIV",
+                                             "Sero-different, FLHIV" = "Serodiscordant, FLHIV"))
+
+datplot %>%
+  filter((both_partners=="Sero-different, MLHIV" | both_partners=="Sero-different, FLHIV") & 
+           ((fullstatus_m=="LHIV, VS" & fullstatus_f=="HIV-, tested past year") |
+              (fullstatus_m=="HIV-, tested past year" & fullstatus_f=="LHIV, VS"))) %>%
+  summarise(tot = sum(prop))
+
+datplot %>%
+  filter((both_partners=="Sero-different, MLHIV" | both_partners=="Sero-different, FLHIV") & 
+           ((fullstatus_m=="LHIV, unaware of status") |
+              (fullstatus_f=="LHIV, unaware of status"))) %>%
+  summarise(tot = sum(prop))
+
+testplot <- ggplot(datplot, aes(x=fullstatus_f,y=fullstatus_m)) +
+  geom_point(aes(color=prop*100,size = prop*100)) +
+  scale_color_viridis("Percent",
+                      option = "D",
+                      trans="sqrt",
+                      breaks = c(5, 20, 50)) +
+  scale_y_discrete(labels = wrap_format(18))+
+  scale_x_discrete(labels = wrap_format(18))+
+  theme_minimal() +
+  labs(x = "Female status",
+       y = "Male status",
+       fill = "Proportion") +
+  theme_minimal() +
+  guides(x = guide_axis(angle = 45)) +
+  new_scale_colour()+
+  geom_text(aes(label = round(prop*100,1), color = color_col)) +
+  facet_wrap(vars(both_partners), nrow=2,
+             scale="free") +
+  theme(panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()) +
+  scale_size(range = c(10,25),guide = "none") +
+  scale_color_manual("",values = c("black","grey70"), guide = "none")
+
+testplot
+
+ggsave("~/Downloads/test_descriptive_plot_updated.png",testplot,
+       scale = 1.2)
+# plot_gg(testplot, width = 5)
+# render_snapshot()
+# 
+# testplot2 <- ggplot(dat_to_plot,aes(x=fullstatus_f,y=fullstatus_m)) +
+#   geom_hex(size = 0.5) +
+#   scale_fill_viridis(option = "C")
+# plot_gg(testplot2, width = 5)
+# render_snapshot()
+
+ggplot(datplot, aes(xmin=f_testing_numeric - w/2 + xshift, 
+                             xmax = f_testing_numeric + w/2 + xshift,
+                             ymin = m_testing_numeric - w /2 + yshift,
+                             ymax = m_testing_numeric + w /2  + yshift, fill = prop)) +
+  geom_rect() +
+  scale_fill_viridis(trans="log",
+                     option = "C",
+                     breaks = c(0.05, 0.5, 1, 2.5),
+                     na.value = "white") +
+  # facet_wrap(vars(cat), nrow=2,
+  #            scales = "free") +
+  scale_x_continuous(expand = c(0,0),
+                     labels = stringr::str_wrap(levels(phia_plotdat_all$f_testing),
+                                                width = 18),
+                     breaks = 1:length(levels(phia_plotdat_all$f_testing)) + xshift_labels) +
+  scale_y_continuous(expand=c(0,0),
+    labels = stringr::str_wrap(levels(phia_plotdat_all$m_testing),
+                                                width = 18),
+                     breaks = 1:length(levels(phia_plotdat_all$m_testing)) + yshift_labels) +
+  # coord_cartesian(ylim = c(min(phia_plotdat_all$m_testing_numeric + phia_plotdat_all$yshift),
+  #                          max(phia_plotdat_all$m_testing_numeric + phia_plotdat_all$yshift))) +
+  # scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+  expand_limits() +
+  labs(x = "Female status",
+       y = "Male status",
+       fill = "Relative mixing") +
+  theme_minimal() +
+  guides(x = guide_axis(angle = 45)) +
+  geom_text(aes(x=f_testing_numeric + xshift,y=m_testing_numeric+yshift,color = color_col,
+                label = round(mixing,2))) +
+  # geom_shadowtext(aes(x=f_testing_numeric + xshift,y=m_testing_numeric+yshift), color ="white",bg.color='black', face.color='black') +
+  theme(strip.text = element_text(size = 14),
+        axis.title = element_text(size = 12)) +
+  scale_color_manual("",values = c("black","grey70"), guide = "none") +
+  geom_text(data = data.frame(f_testing_numeric = c(1.7, 4.75, 1.55, 4.75), 
+                              m_testing_numeric = c(3.5, 3.5, 7.8, 7.8), 
+                              labelvar = c("Seroconcordant, Negative","Serodiscordant, FLHIV",
+                                           "Serodiscordant, MLHIV", "Seroconcordant, LHIV"),
+                              mixing = NA,
+                              w = NA, xshift = NA, yshift=NA),
+            aes(x=f_testing_numeric, y=m_testing_numeric, label = labelvar)) +
+  coord_cartesian(clip = "off")
+
+ggplot(datplot %>% filter(!is.na(fullstatus_f) & !is.na(fullstatus_m)), aes(x=fullstatus_f, y=fullstatus_m, fill=prop)) +
+  geom_tile() +
+  facet_wrap(vars(both_partners), nrow=2,
+             scale="free") +
+  scale_fill_viridis(option="C",
+                     trans="log",
+                     breaks = c(0.005, 0.05, 0.40)) +   
+  theme_minimal() +
+  guides(x = guide_axis(angle = 45)) +
+  labs(x = "Female status",
+       y = "Male status",
+       fill = "Proportion") +
+  geom_text(aes(label = round(prop,2))) +
+  scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) 
+
+# ggsave("~/Downloads/phia_testing_tx_props.png",
+#        width = 8.5, height = 6.75, bg="white")
+
+
+ggplot(datplot %>% filter(!is.na(fullstatus_f) & !is.na(fullstatus_m)), aes(x=fullstatus_f, fill=fullstatus_m, y=prop)) +
+  geom_bar(stat="identity") +
+  facet_wrap(vars(both_partners), nrow=2,
+             scale="free_x") +
+    guides(x = guide_axis(angle = 45)) +
+
+
+ggplot(dat_to_plot %>% filter(!is.na(fullstatus_f) & !is.na(fullstatus_m)), aes(x=fullstatus_f,fill=fullstatus_m)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  facet_wrap(vars(both_partners), nrow=2,
+              scales = "free") 
+```
+
+
+NEXT STEPS:
+- Explore missing data 5.3% missing full status for women, 1.6% for men
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+##### MPHIA 2015-2016 analysis
+
+# mphia <- haven::read_dta("/Users/krisher/Downloads/PHIA data/MPHIA 2015-2016/MPHIA 2015-2016 Household Interview and Biomarker Datasets v2.0 (DTA)/mphia2015adultind.dta")
+# mphia <- mphia %>%
+#   select(gender, age, personid, partnerclusterid, schlhi, ethnicgrp,
+#          religion, hivtslstm, hivtslsty, hivtstever, surveystmonth, surveystyear,
+#          husid, partid1, partid2, partid3, hivrtpg, hivrslr,
+#          hivtstpostbirth, hivtprg, hivttlb, hivtsprgm, hivtsprgy,schlat, parthivtest1,
+#          hivtstrslt) %>%
+#   mutate(hivtslstm_clean = ifelse(hivtslstm %in% c(-8,-9), NA, hivtslstm),
+#          hivtslsty_clean = ifelse(hivtslsty %in% c(-8,-9), NA, hivtslsty),
+#          hiv_test_date = case_when(!is.na(hivtslstm_clean) &
+#                                      !is.na(hivtslsty_clean) &
+#                                      nchar(hivtslstm_clean)==1 ~
+#                                      paste0(hivtslsty_clean,
+#                                             "-0",hivtslstm_clean,"-15"),
+#                                    !is.na(hivtslstm_clean) &
+#                                      !is.na(hivtslsty_clean) &
+#                                      nchar(hivtslstm_clean)==2 ~
+#                                      paste0(hivtslsty_clean,
+#                                             "-",hivtslstm_clean,"-15"),
+#                                    is.na(hivtslstm_clean) &
+#                                      !is.na(hivtslsty_clean) ~
+#                                      paste0(hivtslsty_clean,
+#                                             "-07-01"),
+#                                    TRUE ~ NA_character_),
+#          hivtslstm_prg_clean = ifelse(hivtsprgm %in% c(-8,-9), NA, hivtsprgm),
+#          hivtslsty_prg_clean = ifelse(hivtsprgy %in% c(-8,-9), NA, hivtsprgy),
+#          hiv_test_date_prg = case_when(!is.na(hivtslstm_prg_clean) &
+#                                      !is.na(hivtslsty_prg_clean) &
+#                                      nchar(hivtslstm_prg_clean)==1 ~
+#                                      paste0(hivtslsty_prg_clean,
+#                                             "-0",hivtslstm_prg_clean,"-15"),
+#                                    !is.na(hivtslstm_prg_clean) &
+#                                      !is.na(hivtslsty_prg_clean) &
+#                                      nchar(hivtslstm_prg_clean)==2 ~
+#                                      paste0(hivtslsty_prg_clean,
+#                                             "-",hivtslstm_prg_clean,"-15"),
+#                                    is.na(hivtslstm_prg_clean) &
+#                                      !is.na(hivtslsty_prg_clean) ~
+#                                      paste0(hivtslsty_prg_clean,
+#                                             "-07-01"),
+#                                    TRUE ~ NA_character_),
+#          hivtstever = factor(ifelse(hivtstever %in% c(-8,-9),NA,hivtstever),
+#                              levels = c(1,2),
+#                              labels = c("Yes","No")),
+#          ethnicgrp = factor(ifelse(ethnicgrp %in% c(-8,-9),NA,ethnicgrp),
+#                             levels = c(1,2,3,4,5,6,7,8,96),
+#                             labels = c("Nkhonde","Tumbuka","Tonga","Yao",
+#                                        "Chewa","Sena","Lomwe","Ngoni","Other")),
+#          education = case_when(schlat == 2 ~ 0,
+#                                !schlhi %in% c(-8,-9) ~ schlhi,
+#                                TRUE ~ NA_integer_),
+#          education = factor(education,
+#                          levels = c(0,1,2,3),
+#                          labels = c("None","Primary","Secondary","Higher")),
+#          interview_date = case_when(!is.na(surveystyear) &
+#                                       !is.na(surveystmonth) &
+#                                       nchar(surveystmonth)==1 ~
+#                                       paste0(surveystyear,
+#                                              "-0",surveystmonth,"-15"),
+#                                     !is.na(surveystmonth) &
+#                                       !is.na(surveystyear) &
+#                                       nchar(surveystmonth)==2 ~
+#                                       paste0(surveystyear,
+#                                              "-",surveystmonth,"-15"),
+#                                     TRUE ~ NA_character_),
+#          test_past = (as.Date(interview_date) - as.Date(hiv_test_date))/365,
+#          test_past_prg = (as.Date(interview_date) - as.Date(hiv_test_date_prg))/365,
+#          hiv_testing = case_when(hivtstever=="No" ~ "Never",
+#                                  !is.na(hivrslr) & hivrslr==1 ~ "Positive",
+#                                  !is.na(hivrtpg) & hivrtpg==1 ~ "Positive",
+#                                  !is.na(hivtstrslt) & hivtstrslt==1 ~ "Positive",
+#                                  !is.na(test_past) & test_past<1 ~ "Past yr",
+#                                  !is.na(test_past) & test_past>=1 & test_past<2 ~ "1-2 yrs",
+#                                  !is.na(test_past) & test_past>=2 ~ "2+ yrs",
+#                                  is.na(test_past) & !is.na(test_past_prg) &
+#                                    test_past_prg < 1 ~ "Past yr",
+#                                  is.na(test_past) & !is.na(test_past_prg) &
+#                                    test_past_prg >= 1 & test_past_prg < 2 ~ "1-2 yrs",
+#                                  is.na(test_past) & !is.na(test_past_prg) &
+#                                    test_past_prg >=2 ~ "2+ yrs",
+#                                  TRUE ~ NA_character_))
+# 
+# mphia_bio <- haven::read_dta("/Users/krisher/Downloads/PHIA data/MPHIA 2015-2016/MPHIA 2015-2016 Household Interview and Biomarker Datasets v2.0 (DTA)/mphia2015adultbio.dta")
+# 
+# ###### ONLY KEEPING PEOPLE FOR WHOM HIV STATUS IS NOT MISSING
+# mphia_bio <- mphia_bio %>%
+#   select(personid, hivstatusfinal, aware, arvstatus, vls) %>%
+#   filter(hivstatusfinal !=99)
+# 
+# mphia <- mphia %>%
+#   right_join(mphia_bio)
+# 
+# mphia <- mphia %>%
+#   mutate(fullstatus = case_when(vls==1 ~ "LHIV, VS",
+#                                 arvstatus==1 ~ "LHIV, on ART, not VS",
+#                                 aware==1 ~ "LHIV, aware of status, not on ART",
+#                                 hivstatusfinal == 1 ~ "LHIV, unaware of status",
+#                                 hiv_testing=="Past yr" ~ "HIV-, tested past year",
+#                                 hiv_testing=="Never" ~ "HIV-, never tested",
+#                                 hiv_testing %in% c("1-2 yrs","2+ yrs") ~ "HIV-, tested 1+ yrs ago",
+#                                 TRUE ~ NA_character_))
+# 
+# mphia_f <- filter(mphia,gender==2)
+# mphia_m <- filter(mphia,gender==1)
+# 
+# mphia_f <- mphia_f %>%
+#   rename_with(~ paste0(.x, "_f", recycle0 = TRUE)) %>%
+#   filter(!is.na(partnerclusterid_f)) %>%
+#   mutate(husid_f = ifelse(husid_f %in% c(partid1_f,partid2_f,partid3_f),"",husid_f)) %>%
+#   pivot_longer(c(husid_f,partid1_f,partid2_f,partid3_f), names_to = "partner",
+#                values_to = "partnerid") %>%
+#   filter(partnerid!="")
+# mphia_m <- mphia_m %>%
+#   rename_with(~ paste0(.x, "_m", recycle0 = TRUE)) %>%
+#   filter(!is.na(partnerclusterid_m))
+# 
+# mphia_both <- mphia_f %>%
+#   left_join(mphia_m,
+#             by = c("partnerid"="personid_m"))
+# 
+# table(mphia_both$hivtstever_f,mphia_both$hivtstever_m)
+# phia_mixing <- prop.table(table(mphia_both$hivtstever_f,mphia_both$hivtstever_m)) / (prop.table(table(mphia_both$hivtstever_f)) %*% t(prop.table(table(mphia_both$hivtstever_m))))
+# phia_plotdat <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing))
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# table(mphia_both$hiv_testing_f,mphia_both$hiv_testing_m)
+# phia_mixing <- prop.table(table(mphia_both$hiv_testing_f,mphia_both$hiv_testing_m)) / (prop.table(table(mphia_both$hiv_testing_f)) %*% t(prop.table(table(mphia_both$hiv_testing_m))))
+# phia_plotdat <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing))
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# table(mphia_both$fullstatus_f,mphia_both$fullstatus_m)
+# phia_mixing <- prop.table(table(mphia_both$fullstatus_f,mphia_both$fullstatus_m)) / (prop.table(table(mphia_both$fullstatus_f)) %*% t(prop.table(table(mphia_both$fullstatus_m))))
+# phia_plotdat <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing))
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# mphia_both_neg <- mphia_both %>% filter(hivstatusfinal_f==2 & hivstatusfinal_m==2)
+# table(mphia_both_neg$fullstatus_f,mphia_both_neg$fullstatus_m)
+# phia_mixing <- prop.table(table(mphia_both_neg$fullstatus_f,mphia_both_neg$fullstatus_m)) / (prop.table(table(mphia_both_neg$fullstatus_f)) %*% t(prop.table(table(mphia_both_neg$fullstatus_m))))
+# phia_plotdat1 <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing),
+#          cat = "Seroconcordant, Negative")
+# 
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# mphia_both_pos <- mphia_both %>% filter(hivstatusfinal_f==1 & hivstatusfinal_m==1)
+# table(mphia_both_pos$fullstatus_f,mphia_both_pos$fullstatus_m)
+# phia_mixing <- prop.table(table(mphia_both_pos$fullstatus_f,mphia_both_pos$fullstatus_m)) / (prop.table(table(mphia_both_pos$fullstatus_f)) %*% t(prop.table(table(mphia_both_pos$fullstatus_m))))
+# phia_plotdat2 <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing),
+#          cat = "Seroconcordant, LHIV")
+# 
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# mphia_both_serdis_f <- mphia_both %>% filter(hivstatusfinal_f==1 & hivstatusfinal_m==2)
+# table(mphia_both_serdis_f$fullstatus_f,mphia_both_serdis_f$fullstatus_m)
+# phia_mixing <- prop.table(table(mphia_both_serdis_f$fullstatus_f,mphia_both_serdis_f$fullstatus_m)) / (prop.table(table(mphia_both_serdis_f$fullstatus_f)) %*% t(prop.table(table(mphia_both_serdis_f$fullstatus_m))))
+# phia_plotdat3 <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing),
+#          cat = "Serodiscordant, FLHIV")
+# 
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# mphia_both_serdis_m <- mphia_both %>% filter(hivstatusfinal_f==2 & hivstatusfinal_m==1)
+# table(mphia_both_serdis_m$fullstatus_f,mphia_both_serdis_m$fullstatus_m)
+# phia_mixing <- prop.table(table(mphia_both_serdis_m$fullstatus_f,mphia_both_serdis_m$fullstatus_m)) / (prop.table(table(mphia_both_serdis_m$fullstatus_f)) %*% t(prop.table(table(mphia_both_serdis_m$fullstatus_m))))
+# phia_plotdat4 <- data.frame(phia_mixing) %>%
+#   rename(f_testing = Var1, m_testing = Var2, mixing = Freq) %>%
+#   mutate(mixing = ifelse(mixing==0,(1/10^1.5),mixing),
+#          cat = "Serodiscordant, MLHIV")
+# 
+# ggplot(phia_plotdat, aes(x=f_testing, y = m_testing, fill = mixing)) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C") +
+#   labs(x = "Female testing",
+#        y = "Male testing",
+#        fill = "Relative mixing") +
+#   theme_minimal()
+# 
+# phia_plotdat_all <- bind_rows(phia_plotdat1,
+#                               phia_plotdat2,
+#                               phia_plotdat3,
+#                               phia_plotdat4)
+# 
+# phia_plotdat_all <- phia_plotdat_all %>%
+#   mutate(f_testing = factor(f_testing,
+#                             levels = c("HIV-, never tested", "HIV-, tested 1+ yrs ago",
+#                                        "HIV-, tested past year", "LHIV, unaware of status",
+#                                        "LHIV, aware of status, not on ART", "LHIV, on ART, not VS",
+#                                        "LHIV, VS")),
+#          m_testing = factor(m_testing,
+#                             levels = c("HIV-, never tested", "HIV-, tested 1+ yrs ago",
+#                                        "HIV-, tested past year", "LHIV, unaware of status",
+#                                        "LHIV, aware of status, not on ART", "LHIV, on ART, not VS",
+#                                        "LHIV, VS")))
+# 
+# ggplot(phia_plotdat_all, aes(x=f_testing, y = m_testing, fill = mixing,
+#                              label = round(mixing,2))) +
+#   geom_tile() +
+#   scale_fill_viridis(trans="log",
+#                      option = "C",
+#                      breaks = c(0.05, 0.25, 1, 2.5)) +
+#   facet_wrap(vars(cat), nrow=2,
+#              scales = "free") +
+#   scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+#   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 18)) +
+#   labs(x = "Female status",
+#        y = "Male status",
+#        fill = "Relative mixing") +
+#   theme_minimal() +
+#   guides(x = guide_axis(angle = 45)) +
+#   geom_text()
+```
